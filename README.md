@@ -32,3 +32,9 @@ Programming language and environment:
 - [Flask](https://flask.palletsprojects.com/en/stable/) - server.
 
 I will update about JS environment: like given example, it supports windows.
+
+## Widgets
+
+I will take care that Widgets of the project can be used to create new projects.
+- The environment will be clean and open, and content as modular as I can.
+- This, because I found complications in writing AI tasks: right now, we have several things to implement manually. AI will understand them based on this implementation.
