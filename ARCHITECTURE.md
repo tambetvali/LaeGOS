@@ -2,8 +2,8 @@
 
 We have the following architectural choices for implementation:
 - Hosting: Pythonanywhere, [PythonAnywhere](https://www.pythonanywhere.com/), [LaeGOS 🏠](https://laegna.pythonanywhere.com/).
-- Version Control: Git, [GitHub](https://www.github.com/), [github LaeGOS 🏠](https://www.github.com/tambetvali/LaeGOS), [github LaeGOS-Widgets 📟].(https://www.github.com/tambetvali/LaeGOS-Widgets); this is also the development platform.
-- Programming Language: [Python](https://www.python.com/).
+- Version Control: Git, [GitHub](https://www.github.com/), [github LaeGOS 🏠](https://www.github.com/tambetvali/LaeGOS), [github LaeGOS-Widgets 📟](https://www.github.com/tambetvali/LaeGOS-Widgets); this is also the development platform.
+- Programming Language: [Python](https://www.python.org/).
 - Server type: [Flask](https://flask.palletsprojects.com/en/stable/), [Jinja](https://jinja.palletsprojects.com/en/stable/) templates in-box.
 - Windows system: [WinBox.js](https://nextapps-de.github.io/winbox/).
 
