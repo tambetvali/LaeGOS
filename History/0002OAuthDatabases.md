@@ -1,3 +1,117 @@
+# ⚠️ MongoDB Atlas App Services Deprecation (2025–2026 Update)
+
+**Official MongoDB documentation:**  
+https://www.mongodb.com/docs/atlas/app-services/deprecation/
+
+MongoDB has formally **deprecated the majority of Atlas App Services**.  
+This includes:
+
+- Authentication Providers (Google, Email/Password, Custom JWT, etc.)
+- HTTPS Endpoints
+- Functions
+- Rules & Permissions
+- GraphQL API
+- Data API (legacy App Services version)
+- Device Sync
+- Static Hosting
+- Triggers (legacy App Services triggers)
+
+According to MongoDB:
+
+> App Services features reached End of Life (EOL) on September 30, 2025.
+
+This means:
+
+- These features are **no longer recommended** for new applications.
+- Many App Services UI elements are **hidden or removed** for new Atlas projects.
+- New App Services apps **cannot be created** in many regions/projects.
+- Existing App Services apps continue to run but are **frozen** and will not evolve.
+
+---
+
+# ✔️ What You Should Use Instead (MongoDB’s Official Guidance)
+
+MongoDB recommends replacing App Services with:
+
+### 1. **Direct Driver Connections**
+Use PyMongo, Node, Go, Java, etc.
+
+Docs:  
+https://www.mongodb.com/docs/drivers/
+
+### 2. **Atlas Data API (New Model)**
+HTTP-based CRUD operations without drivers.
+
+Docs:  
+https://www.mongodb.com/docs/atlas/api/data-api/
+
+### 3. **External Authentication Providers**
+Use Google OAuth, Auth0, Firebase, Cognito, etc.  
+MongoDB no longer provides built‑in OAuth.
+
+### 4. **Your Own Backend Logic**
+Use your own server (Flask, FastAPI, Node, etc.) for:
+
+- OAuth flows  
+- Business logic  
+- API endpoints  
+- Access control  
+
+MongoDB no longer provides serverless functions for this.
+
+---
+
+# ✔️ Recommended Architecture for 2026+
+
+### **1. Flask handles OAuth (Google, etc.)**
+- Use `google-auth` or `authlib`
+- Store user sessions in Flask
+- No MongoDB involvement in authentication
+
+### **2. Flask connects to MongoDB via:**
+- PyMongo (recommended), or  
+- Atlas Data API (if you prefer HTTP)
+
+### **3. MongoDB stores your data**
+- Collections, documents, indexes
+- No App Services layer in between
+
+### **4. Optional: Build your own mini‑App‑Services**
+If needed, implement:
+
+- `/api/login`
+- `/api/user`
+- `/api/data/...`
+
+inside Flask.
+
+---
+
+# ❌ What You Should NOT Use Anymore
+
+- App Services Authentication  
+- App Services Functions  
+- App Services HTTPS Endpoints  
+- App Services Rules  
+- App Services GraphQL  
+- App Services Hosting  
+- App Services Sync  
+
+These are deprecated and should not be used for new systems.
+
+---
+
+# 📌 Summary
+
+MongoDB App Services is effectively **retired**.  
+For new applications (including LaeGOS), the correct architecture is:
+
+- **Flask** for OAuth + API logic  
+- **PyMongo or Data API** for database access  
+- **MongoDB Atlas** only as a database, not a backend platform  
+
+This aligns with MongoDB’s official 2025–2026 direction.
+
 # Choosing a Stateless, User‑Owned Knowledge System  
 ### Why It Matters, What It Enables, and How to Build It
 
