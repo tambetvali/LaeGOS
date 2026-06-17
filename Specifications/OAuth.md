@@ -1,179 +1,143 @@
-# 🧩 LaeGOS Authentication & Boot Architecture  
-### _MongoDB Atlas App Services Integration Plan_
+# LaeGOS Architecture — 2026 Update  
+### MongoDB App Services Deprecation & New Backend Model
+
+## 1. Background
+
+MongoDB officially deprecated the majority of **Atlas App Services** features.  
+Deprecation notice:  
+https://www.mongodb.com/docs/atlas/app-services/deprecation/
+
+As of September 30, 2025, the following App Services components reached **End of Life**:
+
+- Authentication Providers (Google, Email/Password, Custom JWT)
+- HTTPS Endpoints
+- Functions
+- Rules & Permissions
+- GraphQL API
+- Device Sync
+- Static Hosting
+- Legacy Data API
+- Legacy Triggers
+
+New Atlas projects may not expose App Services UI at all.  
+Existing apps continue to run but are frozen and not recommended for new systems.
+
+Because of this, LaeGOS must **not** rely on App Services for authentication, backend logic, or API endpoints.
 
 ---
 
-## 🚀 Overview
+## 2. New Recommended Architecture (MongoDB‑aligned, 2026)
 
-This document defines the **authentication and boot architecture** for LaeGOS, using **MongoDB Atlas App Services OAuth** as the *only* login/logout mechanism.
+LaeGOS now uses a **three‑layer architecture**:
 
-The system behaves like a **stateless Linux live CD**, where the OS boots in memory and optionally binds to a cloud user account.
+### Layer 1 — Client (LaeGOS UI)
+- Pure frontend (browser or embedded UI)
+- Communicates only with the LaeGOS Backend API
+- No direct database access
+- No App Services SDK
 
----
+### Layer 2 — LaeGOS Backend (Flask)
+The backend is now responsible for:
 
-## 🖥️ Main Screen Responsibilities
+- OAuth (Google or other providers)
+- Session management
+- Authorization
+- API endpoints (\`/api/...\`)
+- Business logic
+- Validation
+- Rate limiting
+- Logging
 
-The main screen is the **entry point** and exposes exactly **two buttons**:
+Flask replaces App Services Functions + HTTPS Endpoints.
 
-### ✔ **Start Up**
-- Boots the stateless OS  
-- If a MongoDB user is authenticated → OS boots in **user mode**  
-- If not → OS boots in **anonymous mode**
+### Layer 3 — Database (MongoDB Atlas)
+Two supported access methods:
 
-### ✔ **User Authentication**
-- Opens the dedicated `/login` page  
-- `/login` triggers **MongoDB OAuth login**  
-- After login, user is redirected back to the main screen  
-- The main screen does **not** implement login logic  
-- Login/logout is a **side-effect** of MongoDB App Services
+#### Option A — Direct Driver (PyMongo)
+Recommended for performance and flexibility.
 
----
+Docs:  
+https://www.mongodb.com/docs/drivers/pymongo/
 
-## 🔐 Authentication Model
+#### Option B — Atlas Data API (New Model)
+HTTP-based CRUD for environments where drivers are not ideal.
 
-### ✔ Single authentication authority  
-MongoDB Atlas App Services is the **only** login/logout system.
+Docs:  
+https://www.mongodb.com/docs/atlas/api/data-api/
 
-### ✔ Main screen does not handle credentials  
-It only triggers the OAuth flow.
-
-### ✔ Login page is not a UI  
-It is a **redirect trigger** for OAuth.
-
-### ✔ Logout is also MongoDB‑driven  
-The main screen simply calls `user.logOut()`.
-
----
-
-## 🔄 OS Boot Behavior
-
-### When user is authenticated:
-- OS boots with:
-  - User partition  
-  - User database  
-  - User-specific state  
-
-### When user is not authenticated:
-- OS boots in **anonymous stateless mode**
-
-### While OS is running:
-- ❌ User cannot switch accounts  
-- ❌ User cannot log in or out  
-- ✔ Only option: **Restart OS**
-
-### Restarting OS:
-- Returns to main screen  
-- User may:
-  - Authenticate with MongoDB  
-  - Or run anonymously again  
+No App Services layer is used.
 
 ---
 
-## 🧠 State Model Summary
+## 3. Authentication Model
 
-| State | Description |
-|------|-------------|
-| **Main Screen (No User)** | Shows Start Up + User Authentication |
-| **Main Screen (User Authenticated)** | Shows Start Up + “Logged in as …” |
-| **OS Running** | No login/logout allowed; restart required |
-| **Restart** | Returns to main screen |
+### Old Model (Deprecated)
+- App Services Google OAuth
+- App Services User Identities
+- App Services Access Rules
+
+### New Model (2026)
+- OAuth handled entirely in Flask
+- Use \`authlib\` or Google Identity Services
+- Store user sessions in Flask (server-side or JWT)
+- Store user profiles in MongoDB manually
+
+This gives LaeGOS full control and avoids deprecated MongoDB features.
 
 ---
 
-## 🛠️ Implementation Snippets
+## 4. API Model
 
-### Main Screen Logic  
-\`\`\`js
-import { app } from "./realm";
+### Old Model (Deprecated)
+- App Services HTTPS Endpoints
+- App Services Functions
 
-export default function MainScreen() {
-  const user = app.currentUser;
+### New Model (2026)
+Flask exposes:
 
-  return (
-    <div>
-      <button onClick={() => startOS(user)}>
-        Start Up
-      </button>
-
-      {!user && (
-        <button onClick={() => window.location.href = "/login"}>
-          User Authentication
-        </button>
-      )}
-
-      {user && (
-        <div>Logged in as {user.profile.email}</div>
-      )}
-    </div>
-  );
-}
+\`\`\`
+POST /api/login
+POST /api/logout
+GET  /api/user
+GET  /api/data/<collection>
+POST /api/data/<collection>
+PUT  /api/data/<collection>/<id>
+DELETE /api/data/<collection>/<id>
 \`\`\`
 
----
-
-### Login Page (OAuth Redirect Trigger)  
-\`\`\`js
-import { app } from "./realm";
-
-export default function LoginPage() {
-  async function startOAuth() {
-    const credentials = Realm.Credentials.google(); // or github, apple, etc.
-    await app.logIn(credentials);
-    window.location.href = "/";
-  }
-
-  startOAuth();
-
-  return <div>Redirecting…</div>;
-}
-\`\`\`
+All logic is implemented in Python.
 
 ---
 
-### OS Boot Logic  
-\`\`\`js
-function startOS(user) {
-  if (user) {
-    launchOS({ partition: user.id });
-  } else {
-    launchOS({ partition: "anonymous" });
-  }
-}
-\`\`\`
+## 5. Data Access Layer
+
+### Option A — PyMongo (recommended)
+- Fast
+- Full MongoDB feature set
+- Ideal for LaeGOS computational modules
+
+### Option B — Atlas Data API
+- Pure HTTP
+- Good for serverless or restricted environments
+- Simpler deployment
 
 ---
 
-## 📦 MongoDB Partitioning Strategy
+## 6. Security Model
 
-Each authenticated user receives:
-
-- Their own database partition  
-- Their own isolated data  
-- Their own OS state  
-
-Anonymous users share:
-
-- A stateless, ephemeral partition  
-- No persistence  
+- No IP whitelisting required if using Data API
+- If using PyMongo, configure Network Access for backend server IP
+- OAuth tokens validated in Flask
+- Backend enforces user permissions
+- MongoDB stores only application data
 
 ---
 
-## 🧭 Summary
+## 7. Summary
 
-- ✔ Main screen is the **only** place where user switching begins  
-- ✔ Login/logout is **not** implemented by the main screen  
-- ✔ MongoDB OAuth is the **sole** authentication mechanism  
-- ✔ OS cannot switch users while running  
-- ✔ Restart is required to change user  
-- ✔ Architecture mirrors a **stateless Linux live CD** with optional cloud identity  
+The LaeGOS backend no longer depends on MongoDB App Services.  
+The new architecture is:
 
----
+**LaeGOS UI → Flask Backend → MongoDB Atlas**
 
-## 📘 Status
-
-- [x] Architecture defined  
-- [ ] Implement OAuth providers  
-- [ ] Implement partition rules  
-- [ ] Integrate into LaeGOS-Widgets  
-
----
+This aligns with MongoDB’s 2026 platform direction and avoids deprecated components.
