@@ -1,3 +1,7 @@
+# Run (currently starting to develop)
+
+### [📟 LaeGOS](https://laegna.pythonanywhere.com)
+
 # This repo
 
 This repo is the documentation, task and AI or human theoretical study repository, almost everything except the code folder for this project (so also everything we find out later).
