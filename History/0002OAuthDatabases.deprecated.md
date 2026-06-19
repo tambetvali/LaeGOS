@@ -1,3 +1,16 @@
+Final conclusion: support told that they do not serve and never serve *exactly* the service I need, and the closest solution is deprecated and such service not offered. I deprecated this whole OAuth start and we start from a clean page, leaving this intermediate status about progress: which generally convinced me that MongoDB might be more complex than it seems, because it appears as solid, flat structure with too many options and selections - one which is very good for professional use, but does not help us if we want to specialize what we are meant to do, as domain professionals who rely on open source and shared responsibility.
+
+# History of choosing OAuth
+
+I became very convinced that MongoDB Atlas is the best solution in this field, but it failed my qualification criteria anyway:
+- All the functions CoPilot knew, or which were documented at all, were deprecated. This looks like TensorFlow vs. PyTorch: it's not really documented how to start basic application with essential needs.
+  - Basically I could find no buttons CoPilot was talking about.
+
+So basically, if important library or service got all it's basics deprecated, after becoming famous and collecting huge library of books and resources:
+- Automatically, this means deprecated for us as well, because we take advantage from the book writers, rather than destroying their work to be "better" - [MongoDB Atlas](https://github.com/tambetvali/LaeGOS/blob/main/History/0002OAuthDatabases.deprecated.md).
+
+We tried the non-deprecated MongoDB model as well, but it's bots were not updated to know new versions, and now it takes some time to reach a decent, working system for the whole purpose: so the documents about OAuth will get updated and I probably leave some trace of the progress.
+
 # ⚠️ MongoDB Atlas App Services Deprecation (2025–2026 Update)
 
 **Official MongoDB documentation:**  
